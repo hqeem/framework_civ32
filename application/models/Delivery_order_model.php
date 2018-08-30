@@ -2,12 +2,12 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Barang_model extends MY_Model
+class Delivery_order_model extends MY_Model
 {
-    public $table = 'barang';
+    public $table = 'delivery_order';
     public $primary_key = 'id';
-    public $column_order = array(null, 'id','kode','nama',null);
-    public $column_search = array('id','kode','nama');
+    public $column_order = array(null, 'id','nomor_do','tanggal_do','tanggal_kirim','kode_relasi','nama_relasi','jumlah_order','keterangan',null);
+    public $column_search = array('id','nomor_do','tanggal_do','tanggal_kirim','kode_relasi','nama_relasi','jumlah_order','keterangan');
     public $order = array('id' => 'desc'); // default order
 
     public function __construct()
@@ -82,7 +82,7 @@ class Barang_model extends MY_Model
     }
 
     public function save($data)
-    {        
+    {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
     }
@@ -99,6 +99,45 @@ class Barang_model extends MY_Model
         $this->db->delete($this->table);
     }
 
+    public function combo_kode_relasi($and_or, $order_by, $page_num, $per_page, $q_word,$search_field)
+    {
+        $data = array();
 
+        $offset   = ($page_num - 1) * $per_page;
+
+        if(!empty($q_word[0])){
+            $this->db->like('kode',$q_word[0],'both');
+            $this->db->or_like('nama',$q_word[0],'both');
+            $this->db->or_like('alamat',$q_word[0],'both');
+        }
+
+        $this->db->order_by('kode', 'ASC');
+        $query = $this->db->get('relasi', $per_page, $offset);
+        if(!empty($q_word[0])){ $totaly2 = $query->num_rows();}else{ $totaly2 = $this->db->count_all('relasi'); }
+
+        if ($totaly2 > 0) {
+            foreach ($query->result() as $atributy) {
+
+                $data[] = array(
+                    'id' => $atributy->id,
+                    'kode' => $atributy->kode,
+                    'nama' => $atributy->nama,
+                    'alamat' => $atributy->alamat
+                );
+            }
+
+        }
+
+        return array('cnt_whole'=>$totaly2,'result' => $data);
+
+    }
+
+    public function get_relasi_by_kode($kode)
+    {
+        $this->db->from('relasi');
+        $this->db->where('kode',$kode);
+        $query = $this->db->get();
+        return $query->row();
+    }
 
 }

@@ -6,7 +6,8 @@
 		"maltyxx/restclient": "^3.0",
 		"kenjis/codeigniter-doctrine": "1.0.x@dev",
 		"roave/security-advisories": "dev-master",
-		"kenjis/codeigniter-ss-twig": "1.0.x@dev"
+		"kenjis/codeigniter-ss-twig": "1.0.x@dev",
+		"hisamu/php-xbase": "^1.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^6.0",

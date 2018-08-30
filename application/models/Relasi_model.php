@@ -2,12 +2,12 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Barang_model extends MY_Model
+class Relasi_model extends MY_Model
 {
-    public $table = 'barang';
+    public $table = 'relasi';
     public $primary_key = 'id';
-    public $column_order = array(null, 'id','kode','nama',null);
-    public $column_search = array('id','kode','nama');
+    public $column_order = array(null, 'id','kode','nama','alamat',null);
+    public $column_search = array('id','kode','nama','alamat');
     public $order = array('id' => 'desc'); // default order
 
     public function __construct()
@@ -82,7 +82,7 @@ class Barang_model extends MY_Model
     }
 
     public function save($data)
-    {        
+    {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
     }

@@ -6,8 +6,8 @@ class Barang_model extends MY_Model
 {
     public $table = 'barang';
     public $primary_key = 'id';
-    public $column_order = array(null, 'id','kode','nama',null);
-    public $column_search = array('id','kode','nama');
+    public $column_order = array(null, 'id','nama','keterangan','kategori','tgl',null);
+    public $column_search = array('id','nama','keterangan','kategori','tgl');
     public $order = array('id' => 'desc'); // default order
 
     public function __construct()
@@ -17,8 +17,8 @@ class Barang_model extends MY_Model
 
     private function _get_datatables_query()
     {
-        $this->db->from($this->table);
-        $i = 0;
+       $this->db->from($this->table);
+          $i = 0;
         foreach ($this->column_search as $item) // loop column
         {
             if($_POST['search']['value']) // if datatable send POST for search
@@ -78,11 +78,12 @@ class Barang_model extends MY_Model
         $this->db->from($this->table);
         $this->db->where($this->primary_key,$id);
         $query = $this->db->get();
+
         return $query->row();
     }
 
     public function save($data)
-    {        
+    {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
     }
@@ -97,6 +98,37 @@ class Barang_model extends MY_Model
     {
         $this->db->where($this->primary_key, $id);
         $this->db->delete($this->table);
+    }
+
+    public function combo_jenis_barang($and_or, $order_by, $page_num, $per_page, $q_word,$search_field)
+    {
+        $data = array();
+
+        $offset   = ($page_num - 1) * $per_page;
+
+        if(!empty($q_word[0])){
+            $this->db->like('jenis_barang',$q_word[0],'both');
+            $this->db->or_like('keterangan',$q_word[0],'both');
+        }
+
+        $this->db->order_by('jenis_barang', 'ASC');
+        $query = $this->db->get('jenis_barang', $per_page, $offset);
+        if(!empty($q_word[0])){ $totaly2 = $query->num_rows();}else{ $totaly2 = $this->db->count_all('jenis_barang'); }
+
+        if ($totaly2 > 0) {
+            foreach ($query->result() as $atributy) {
+
+                $data[] = array(
+                    'id' => $atributy->id,
+                    'jenis_barang' => $atributy->jenis_barang,
+                    'keterangan' => $atributy->keterangan
+                );
+            }
+
+        }
+
+        return array('cnt_whole'=>$totaly2,'result' => $data);
+
     }
 
 

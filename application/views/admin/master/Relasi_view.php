@@ -7,7 +7,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Data Customers</h2>
+                            <h2>Data Relasi</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -16,7 +16,7 @@
                         </div>
                         <div class="x_content">
                             <p>
-                                <button class="btn btn-success" onclick="add_customers()"><i class="glyphicon glyphicon-plus"></i> Tambah Customers</button>
+                                <button class="btn btn-success" onclick="add_relasi()"><i class="glyphicon glyphicon-plus"></i> Tambah Relasi</button>
                                 <button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
                             </p>
 
@@ -26,9 +26,9 @@
                                 <tr>
                                     <th>No</th>
                                     <!-- <th>Id</th> -->
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Fact</th>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Alamat</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -65,7 +65,7 @@
             "order": [], //Initial no order.
             // Load data for the table's content from an Ajax source
             "ajax": {
-                "url": "<?php echo site_url('admin/master/customers/get_data_all');?>",
+                "url": "<?php echo site_url('admin/master/relasi/get_data_all');?>",
                 "type": "POST"
             },
             buttons: [
@@ -136,7 +136,7 @@
 
 
 
-    function add_customers()
+    function add_relasi()
     {
         save_method = 'add';
         $('#form')[0].reset(); // reset form on modals
@@ -144,7 +144,7 @@
         $('.help-block').empty(); // clear error string
         /*table_detail.clear().draw();*/
         $('#modal_form').modal('show'); // show bootstrap modal
-        $('.modal-title').text('Tambah Customers'); // Set Title to Bootstrap modal title
+        $('.modal-title').text('Tambah Relasi'); // Set Title to Bootstrap modal title
     }
 
     // Matikan Kalau tidak ada detail
@@ -158,7 +158,7 @@
         $('.modal-title').text('Tambah Detail Barang'); // Set Title to Bootstrap modal title
     }*/
 
-    function edit_customers(id)
+    function edit_relasi(id)
     {
         save_method = 'update';
         $('#form')[0].reset(); // reset form on modals
@@ -167,15 +167,15 @@
 
         //Ajax Load data from ajax
         $.ajax({
-            url : "<?php echo site_url('admin/master/customers/edit/')?>/" + id,
+            url : "<?php echo site_url('admin/master/relasi/edit/')?>/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data)
             {
                 $('[name="id"]').val(data[0]['id']);
-                $('[name="name"]').val(data[0]['name']);
-                $('[name="email"]').val(data[0]['email']);
-                $('[name="fact"]').val(data[0]['fact']);
+                $('[name="kode"]').val(data[0]['kode']);
+                $('[name="nama"]').val(data[0]['nama']);
+                $('[name="alamat"]').val(data[0]['alamat']);
                 
                 // Matikan Kalau tidak ada detail.
                 /*table_detail.clear().draw();
@@ -185,7 +185,7 @@
                 }*/
 
                 $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-                $('.modal-title').text('Ubah Customers'); // Set title to Bootstrap modal title
+                $('.modal-title').text('Ubah Relasi'); // Set title to Bootstrap modal title
 
             },
             error: function (jqXHR, textStatus, errorThrown)
@@ -206,9 +206,9 @@
         var url;
 
         if(save_method === 'add') {
-            url = "<?php echo site_url('admin/master/customers/add')?>";
+            url = "<?php echo site_url('admin/master/relasi/add')?>";
         } else {
-            url = "<?php echo site_url('admin/master/customers/update')?>";
+            url = "<?php echo site_url('admin/master/relasi/update')?>";
         }
 
         seen = [];
@@ -294,13 +294,13 @@
         } );
     }*/
 
-    function delete_customers(id)
+    function delete_relasi(id)
     {
         if(confirm('Anda yakin mau menghapus data ini ?'))
         {
             // ajax delete data to database
             $.ajax({
-                url : "<?php echo site_url('admin/master/customers/delete')?>/"+id,
+                url : "<?php echo site_url('admin/master/relasi/delete')?>/"+id,
                 type: "POST",
                 dataType: "JSON",
                 success: function(data)
@@ -316,6 +316,12 @@
             });
 
         }
+    }    
+
+    function upperCaseF(a){
+        setTimeout(function(){
+            a.value = a.value.toUpperCase();
+        }, 1);
     }
 
 </script>
@@ -326,30 +332,30 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title">Form Customers</h3>
+                <h3 class="modal-title">Form Relasi</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/>
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">Name <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Kode <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="name" placeholder="Nama Customers" class="validate[required,minSize[6]] form-control" type="text" required="required">
+                                <input name="kode" placeholder="Kode Relasi" class="validate[required,minSize[1]] form-control" type="text" required="required" onkeydown="upperCaseF(this)">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Email <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Nama <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="email" placeholder="Email" class="validate[required,custom[email]] form-control" type="email" required="required">
+                                <input name="nama" placeholder="Nama Relasi" class="validate[required,minSize[6]] form-control" type="text" required="required">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Fact <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Alamat <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="fact" placeholder="Fact" class="validate[required,minSize[6]] form-control" type="text" required="required">
+                                <textarea name="alamat" placeholder="Alamat Relasi" class="validate[required,minSize[6]] form-control" type="text" required="required"></textarea>
                                 <span class="help-block"></span>
                             </div>
                         </div>

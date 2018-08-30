@@ -25,11 +25,8 @@
                                 <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Id</th>
+                                    <th>Kode</th>
                                     <th>Nama</th>
-                                    <th>Keterangan</th>
-                                    <th>Kategori</th>
-                                    <th>Tgl</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -102,14 +99,14 @@
             ]
         });
 
-        table_detail = $('#datatable-detail').DataTable({
+        // Matikan kalau tidak ada detail. 
+        /*table_detail = $('#datatable-detail').DataTable({
             "processing": true, //Feature control the processing indicator.
             "serverSide": false, //Feature control DataTables' server-side processing mode.
             "order": [], //Initial no order.
             responsive: true,
             columns: [
                 { title: "Id" },
-                { title: "Jenis Barang" },
                 { title: "Barang" },
                 { title: "Action" , width:'25'}
             ],
@@ -122,7 +119,7 @@
                     "visible": false
                 }
             ]
-        });
+        });*/
 
         //datepicker
         $('.datepicker').datepicker({
@@ -143,19 +140,21 @@
         $('#form')[0].reset(); // reset form on modals
         $('.form-group').removeClass('has-error'); // clear error class
         $('.help-block').empty(); // clear error string
-        table_detail.clear().draw();
+        /*table_detail.clear().draw();*/
         $('#modal_form').modal('show'); // show bootstrap modal
         $('.modal-title').text('Tambah Barang'); // Set Title to Bootstrap modal title
     }
 
-    function add_Detailbarang()
+    // Matikan Kalau tidak ada detail
+   /* function add_Detailbarang()
     {
         save_method_detail = 'add';
         $('#formDetail')[0].reset(); // reset form on modals
         $('.form-group').removeClass('has-error'); // clear error class
         $('.help-block').empty(); // clear error string
         $('#modal_formDetail').modal('show'); // show bootstrap modal
-    }
+        $('.modal-title').text('Tambah Detail Barang'); // Set Title to Bootstrap modal title
+    }*/
 
     function edit_barang(id)
     {
@@ -172,15 +171,15 @@
             success: function(data)
             {
                 $('[name="id"]').val(data[0]['id']);
+                $('[name="kode"]').val(data[0]['kode']);
                 $('[name="nama"]').val(data[0]['nama']);
-                $('[name="keterangan"]').val(data[0]['keterangan']);
-                $('[name="kategori"]').val(data[0]['kategori']);
-                $('[name="tgl"]').val(data[0]['tgl']);
-                table_detail.clear().draw();
+                
+                // Matikan Kalau tidak ada detail.
+                /*table_detail.clear().draw();
                 for(var i = 0; i < data[0]['detailBarang'].length; i++) {
                     var obj = data[0]['detailBarang'][i];
-                    table_detail.row.add([obj.id, obj.jenis_barang, obj.barang, obj.action]).draw();
-                }
+                    table_detail.row.add([obj.id, obj.barang, obj.action]).draw();
+                }*/
 
                 $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
                 $('.modal-title').text('Ubah Barang'); // Set title to Bootstrap modal title
@@ -193,18 +192,9 @@
         });
     }
 
-    function cekData() {
-        var data = table_detail .rows().data();
-    }
-
     function reload_table()
     {
         table.ajax.reload(null,false); //reload datatable ajax
-    }
-
-    function reload_Detailtable()
-    {
-        table_detail.ajax.reload(null,false); //reload datatable ajax
     }
 
     function save()
@@ -219,22 +209,18 @@
         }
 
         seen = [];
-
-        json = JSON.stringify(table_detail .rows().data(), function(key, val) {
+        
+        
+        // Matikan kalau tidak ada Detail
+        /*json = JSON.stringify(table_detail .rows().data(), function(key, val) {
             if (typeof val === "object") {
                 if (seen.indexOf(val) >= 0)
                     return
                     seen.push(val)
             }
             return val
-        });
-
-
+        });*/
         if(!$("#form").validationEngine('validate')){
-            return false;
-        }
-
-        if(!$("#formDetail").validationEngine('validate')){
             return false;
         }
 
@@ -245,7 +231,9 @@
         $.ajax({
             url : url,
             type: "POST",
-            data: $('#form').serialize() + "&dataDetail=" + json,
+            // Matikan kalau tidak ada detail
+            //data: $('#form').serialize() + "&dataDetail=" + json,
+            data: $('#form').serialize(),
             dataType: "JSON",
             success: function(data)
             {
@@ -263,41 +251,30 @@
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
-                alert('Error adding / update data');
+                alert('Error adding / update data, cek kesamaan Kode Barang');
                 $('#btnSave').text('simpan'); //change button text
                 $('#btnSave').attr('disabled',false); //set button enable
 
             }
         });
+
+
     }
 
-    function saveDetail()
+    /*function saveDetail()
     {
-
-        var x = document.getElementById("jenis_barang").title;
-        if(x==="Attention : Please choose from among the list."){
-            $("#jenis_barang").val("");
-            return false;
-        }
-
-        if(!$("#formDetail").validationEngine('validate')){
-            return false;
-        }
-
         $('#btnSaveDetail').text('menyimpan...'); //change button text
         $('#btnSaveDetail').attr('disabled',true); //set button disable
-
         var url;
 
         if(save_method_detail === 'add') {
 
             var dd =  $('#formDetail').serialize();
             var nama_barang =   $('#modal_formDetail').find('[name="nama_barang"]').val();
-            var jenis_barang =   $('#modal_formDetail').find('[name="jenis_barang"]').val();
             var aksi = "<a class='btn btn-sm btn-danger' href='javascript:void(0)' title='Hapus' onclick='hapus_dataDetail()'><i class='glyphicon glyphicon-trash'></i> Delete</a>";
 
             iterasi++;
-            table_detail.row.add(['', jenis_barang, nama_barang, aksi]).draw();
+            table_detail.row.add(['', nama_barang, aksi]).draw();
 
             $('#modal_formDetail').modal('hide');
             $('#btnSaveDetail').text('simpan'); //change button text
@@ -306,13 +283,13 @@
         } else {
 
         }
-    }
+    }*/
 
-    function hapus_dataDetail() {
+    /*function hapus_dataDetail() {
         $('#datatable-detail').on( 'click', 'tbody tr', function () {
             table_detail.row( this ).remove().draw();
         } );
-    }
+    }*/
 
     function delete_barang(id)
     {
@@ -337,6 +314,13 @@
 
         }
     }
+
+    function upperCaseF(a){
+        setTimeout(function(){
+            a.value = a.value.toUpperCase();
+        }, 1);
+    }
+
 </script>
 
 <!-- Bootstrap modal -->
@@ -352,53 +336,34 @@
                     <input type="hidden" value="" name="id"/>
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">Nama <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Kode Barang <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="nama" placeholder="Nama Barang" class="validate[required,minSize[6]] form-control" type="text" required="required" data-validate-length-range="6" data-validate-words="2">
+                                <input name="kode" placeholder="Kode Barang" class="validate[required,minSize[1]] form-control" type="text" required="required" onkeydown="upperCaseF(this)">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Keterangan <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Nama Barang <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="keterangan" placeholder="Keterangan" class="validate[required,minSize[6]] form-control" type="text" required="required">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Kategori <span class="required">*</span></label>
-                            <div class="col-md-9">
-                                <select name="kategori" class="validate[required] form-control" required="required">
-                                    <option value="">--Pilih Kategori--</option>
-                                    <option value="pecah belah">Pecah Belah</option>
-                                    <option value="biasa">Biasa</option>
-                                </select>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Tgl. Barang <span class="required">*</span></label>
-                            <div class="col-md-9">
-                                <input placeholder="mm/dd/yyyy" name="tgl" class="validate[required] form-control datepicker" type="text" required="required">
+                                <input name="nama" placeholder="Nama Barang" class="validate[required,minSize[6]] form-control" type="text" required="required">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                     </div>
 
-                <p>
-                    <a href="javascript:void(0)" class="btn btn-success" onclick="add_Detailbarang();"><i class="glyphicon glyphicon-plus"></i> Tambah Detail Barang</a>
+               <!-- <p>
+                    <a href="javascript:void(0)" class="btn btn-success" onclick="add_Detailbarang();"><i class="glyphicon glyphicon-plus"></i> Tambah Barang</a>
                 </p>
 
                 <table id="datatable-detail" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>Id</th>
-                        <th>Jenis Barang</th>
                         <th>Barang</th>
                         <th>Action</th>
                     </tr>
                     </thead>
-                </table>
+                </table>-->
 
                 </form>
             </div>
@@ -414,28 +379,21 @@
 
 
 <!-- Bootstrap modal -->
-<div class="modal fade" id="modal_formDetail" role="dialog">
+<!--<div class="modal fade" id="modal_formDetail" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3>Form Detail Barang</h3>
+                <h3 class="modal-title">Form Detail Barang</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="formDetail" class="form-horizontal">
                     <input type="hidden" value="" name="id"/>
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">Jenis Barang <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Nama Barang</label>
                             <div class="col-md-9">
-                                <input name="jenis_barang" id="jenis_barang" placeholder="Jenis Barang" class="validate[required] form-control" type="text">
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">Nama Barang <span class="required">*</span></label>
-                            <div class="col-md-9">
-                                <input name="nama_barang" placeholder="Nama Barang" class="validate[required,minSize[6]] form-control" type="text" required="required">
+                                <input name="nama_barang" placeholder="Nama Barang" class="form-control" type="text">
                                 <span class="help-block"></span>
                             </div>
                         </div>
@@ -446,52 +404,7 @@
                 <button type="button" id="btnSaveDetail" onclick="saveDetail()" class="btn btn-primary">Simpan</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div>-->
 <!-- End Bootstrap modal -->
-
-<script>
-
-
-
-
-    $('#jenis_barang').ajaxComboBox(
-        '<?php echo site_url('admin/master/barang/combo_jenis_barang/');?>',
-        {
-            lang: 'en',
-            field: 'jenis_barang',
-            sub_info: true,
-            select_only: true,
-            sub_as: {
-                id: 'Id',
-                jenis_barang: 'Jenis Barang',
-                keterangan: 'Keterangan'
-            },
-            bind_to: 'foo',
-            primary_key: 'jenis_barang',
-            show_field: 'id,jenis_barang,keterangan',
-            button_img: '<?php echo site_url('assets/ajax.combobox/dist/btn.png');?>'
-        }
-    )
-        .bind('foo', function(e, is_enter_key) {
-            if (!is_enter_key) {
-
-                var x = document.getElementById("jenis_barang").title;
-                if(x==="Attention : Please choose from among the list."){
-                    $("#jenis_barang").val("");
-                }
-            }
-        })
-        .keydown(function(e) {
-            if(e.keyCode === 13) {
-                var x = document.getElementById("jenis_barang").title;
-                if(x==="Attention : Please choose from among the list."){
-                    $("#jenis_barang").val("");
-                }
-            }
-        });
-
-
-
-</script>

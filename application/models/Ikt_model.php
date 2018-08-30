@@ -2,12 +2,12 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Barang_model extends MY_Model
+class Ikt_model extends MY_Model
 {
-    public $table = 'barang';
+    public $table = 'ikt';
     public $primary_key = 'id';
-    public $column_order = array(null, 'id','kode','nama',null);
-    public $column_search = array('id','kode','nama');
+    public $column_order = array(null, 'id','no_kik','tgl_kik','kode_prod','pjg','jml_bng','no_patrun','motif',null);
+    public $column_search = array('id','no_kik','tgl_kik','kode_prod','pjg','jml_bng','no_patrun','motif');
     public $order = array('id' => 'desc'); // default order
 
     public function __construct()
@@ -73,18 +73,41 @@ class Barang_model extends MY_Model
         return $this->db->count_all_results();
     }
 
-    public function get_by_id($id)
+    public function reset_table()
     {
-        $this->db->from($this->table);
-        $this->db->where($this->primary_key,$id);
-        $query = $this->db->get();
-        return $query->row();
+        $this->db->empty_table($this->table);
     }
 
     public function save($data)
-    {        
+    {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
+    }    
+
+    public function check_similar_item($data)
+    {        
+        $this->db->from($this->table);
+        $this->db->where('no_kik',$data['no_kik']);
+        $query = $this->db->get();
+
+        if ($query->num_rows() > 0)
+        {
+            return true;
+        }
+        else { return false; }
+    }
+
+    public function save_detail($data_detail)
+    {
+        $this->db->insert('detail_ikt', $data_detail);
+    }
+
+    public function update_monitoring($no_kik)
+    {
+        $data = array(
+            'no_kik'=>$no_kik
+        );
+        $this->db->insert('monitoring_ikt', $data);
     }
 
     public function update_by_id($where, $data)
@@ -99,6 +122,37 @@ class Barang_model extends MY_Model
         $this->db->delete($this->table);
     }
 
+    public function delete_by_tgl($tanggal)
+    {
+        $this->db->where('prs_date', $tanggal);
+        $this->db->delete($this->table);
+    }
 
+    public function get_detail($id){
+        $data = array();
+        $this->db->from('detail_ikt');
+        $this->db->where('id_ikt',$id);
+        $query = $this->db->get();
+
+        $totaly2 = $query->num_rows();
+        if ($totaly2 > 0) {
+            foreach ($query->result() as $atributy) {
+
+                $data[] = array(
+                    'id' => $atributy->id,
+                    'id_ikt' => $atributy->id_ikt,
+                    'no_patrun' => $atributy->no_patrun,
+                    'motif' => $atributy->motif,
+                    'lusi' => $atributy->lusi,
+                    'pakan' => $atributy->pakan,
+                    'sulur' => $atributy->sulur,
+                    'tumpal' => $atributy->tumpal
+                );
+            }
+
+        }
+        return $data;
+
+    }
 
 }

@@ -10,6 +10,8 @@
 /**
  * @property  ion_auth $ion_auth
  * @property  barang_model $barang_model
+ * @property  datatables $datatables
+ * @property  detail_barang_model $detail_barang_model
  */
 class Barang extends Admin_Controller
 {
@@ -24,6 +26,7 @@ class Barang extends Admin_Controller
         $this->load->helper('text');
         $this->load->helper('url');
         $this->load->model('barang_model');
+        $this->load->model('detail_barang_model');
     }
 
     public function index()
@@ -40,8 +43,11 @@ class Barang extends Admin_Controller
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $dt->kode;
+            // $row[] = $dt->id;
             $row[] = $dt->nama;
+            $row[] = $dt->keterangan;
+            $row[] = $dt->kategori;
+            $row[] = $this->tanggal($dt->tgl);
             $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_barang('."'".$dt->id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
 				  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_barang('."'".$dt->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
             $data[] = $row;
@@ -62,9 +68,11 @@ class Barang extends Admin_Controller
         $data = $this->barang_model->get($id);
         $data  = array(
             'id' => $data->id,
-            'kode' => $data->kode,
             'nama' => $data->nama,
-            'detailBarang'=> (array) null
+            'keterangan' => $data->keterangan,
+            'tgl' => $this->tanggal($data->tgl),
+            'kategori' => $data->kategori,
+            'detailBarang'=> (array) $this->detail_barang_model->getDataByTransaksi($id)
         );
         echo json_encode(array($data));
     }
@@ -76,28 +84,30 @@ class Barang extends Admin_Controller
         $json = json_decode($datax);
 
         $data = array(
-            'kode' => $this->input->post('kode'),
-            'nama' => $this->input->post('nama')
+            'nama' => $this->input->post('nama'),
+            'keterangan' => $this->input->post('keterangan'),
+            'kategori' => $this->input->post('kategori'),
+            'tgl' => $this->tanggaldb($this->input->post('tgl'))
         );
         $insert = $this->barang_model->save($data);
         $id = $this->db->insert_id();
 
-        // Matikan Kalau tidak ada detail
-        /*if($id){
+        if($id){
             $i=0;
             foreach ($json as $ax) :
                 if(!is_object($ax)){
                     if(is_string($ax[0])){
                         $data_detail = array(
                             'id_barang' => $id,
-                            'barang' => $ax[1]
+                            'jenis_barang' => $ax[1],
+                            'barang' => $ax[2]
                         );
                         $this->detail_barang_model->insert($data_detail);
                     }
                 }
                 $i++;
             endforeach;
-        }*/
+        }
 
         echo json_encode(array("status" => TRUE));
     }
@@ -108,14 +118,14 @@ class Barang extends Admin_Controller
         $json = json_decode($datax);
 
         $data = array(
-            'kode' => $this->input->post('kode'),
-            'nama' => $this->input->post('nama')
+            'nama' => $this->input->post('nama'),
+            'keterangan' => $this->input->post('keterangan'),
+            'kategori' => $this->input->post('kategori'),
+            'tgl' => $this->tanggaldb($this->input->post('tgl'))
         );
         $this->barang_model->update_by_id(array('id' => $this->input->post('id')), $data);
 
-        // Matikan kalau tidak ada Detail.
-
-        /*$datay = $this->detail_barang_model->getDataByTransaksi($this->input->post('id'));
+        $datay = $this->detail_barang_model->getDataByTransaksi($this->input->post('id'));
         foreach ($datay as $rw) :
             $this->detail_barang_model->delete($rw['id']);
         endforeach;
@@ -126,27 +136,39 @@ class Barang extends Admin_Controller
                 if(is_string($ax[0])){
                         $data_detail = array(
                             'id_barang' => $this->input->post('id'),
-                            'barang' => $ax[1]
+                            'jenis_barang' => $ax[1],
+                            'barang' => $ax[2]
                         );
                         $this->detail_barang_model->insert($data_detail);
                 }
             }
             $i++;
-        endforeach;*/
+        endforeach;
 
         echo json_encode(array("status" => TRUE));
     }
 
     public function delete($id)
     {
-        // Matikan kalau tidak ada detail
-        /*$datay = $this->detail_barang_model->getDataByTransaksi($id);
+        $datay = $this->detail_barang_model->getDataByTransaksi($id);
         foreach ($datay as $rw) :
             $this->detail_barang_model->delete($rw['id']);
-        endforeach;*/
+        endforeach;
 
         $this->barang_model->delete($id);
         echo json_encode(array("status" => TRUE));
+    }
+
+    public function combo_jenis_barang(){
+        $and_or = $this->input->get('and_or');
+        $order_by = $this->input->get('order_by');
+        $page_num= $this->input->get('page_num');
+        $per_page= $this->input->get('per_page');
+        $q_word= $this->input->get('q_word');
+        $search_field= $this->input->get('search_field');
+
+        $datanya = $this->barang_model->combo_jenis_barang($and_or,$order_by,$page_num,$per_page,$q_word,$search_field);
+        echo json_encode($datanya);
     }
 
 

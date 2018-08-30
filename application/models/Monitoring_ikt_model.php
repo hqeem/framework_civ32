@@ -2,12 +2,12 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Barang_model extends MY_Model
+class Monitoring_ikt_model extends MY_Model
 {
-    public $table = 'barang';
+    public $table = 'monitoring_ikt';
     public $primary_key = 'id';
-    public $column_order = array(null, 'id','kode','nama',null);
-    public $column_search = array('id','kode','nama');
+    public $column_order = array(null, 'id','no_kik','warping','jml_warping','sizing','jml_sizing','mutasi_beam','jml_mutasi_beam',null);
+    public $column_search = array('id','no_kik','warping','jml_warping','sizing','jml_sizing','mutasi_beam','jml_mutasi_beam');
     public $order = array('id' => 'desc'); // default order
 
     public function __construct()
@@ -73,18 +73,21 @@ class Barang_model extends MY_Model
         return $this->db->count_all_results();
     }
 
-    public function get_by_id($id)
+    public function reset_table()
     {
-        $this->db->from($this->table);
-        $this->db->where($this->primary_key,$id);
-        $query = $this->db->get();
-        return $query->row();
+        $this->db->empty_table($this->table);
     }
 
     public function save($data)
-    {        
+    {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
+    }
+
+    public function save_detail($data_detail)
+    {
+        $this->db->insert('detail_monitoring_ikt', $data_detail);
+        // return $this->db->insert_id();
     }
 
     public function update_by_id($where, $data)
@@ -99,6 +102,29 @@ class Barang_model extends MY_Model
         $this->db->delete($this->table);
     }
 
+    public function get_detail($id){
+        $data = array();
+        $this->db->from('detail_monitoring_ikt');
+        $this->db->where('id_monitoring_ikt',$id);
+        $query = $this->db->get();
 
+        $totaly2 = $query->num_rows();
+        if ($totaly2 > 0) {
+            foreach ($query->result() as $atributy) {
+
+                $data[] = array(
+                    'id' => $atributy->id,
+                    'id_monitoring_ikt' => $atributy->id_monitoring_ikt,
+                    'nomor_patrun' => $atributy->nomor_patrun,
+                    'motif' => $atributy->motif,
+                    'lusi' => $atributy->lusi,
+                    'pakan' => $atributy->pakan
+                );
+            }
+
+        }
+        return $data;
+
+    }
 
 }

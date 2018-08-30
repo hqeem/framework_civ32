@@ -9,9 +9,9 @@
 
 /**
  * @property  ion_auth $ion_auth
- * @property  customer_model $customer_model
+ * @property  relasi_model $relasi_model
  */
-class Customers extends Admin_Controller
+class Relasi extends Admin_Controller
 {
 
     function __construct()
@@ -23,17 +23,17 @@ class Customers extends Admin_Controller
         $this->load->library('form_validation');
         $this->load->helper('text');
         $this->load->helper('url');
-        $this->load->model('customer_model');
+        $this->load->model('relasi_model');
     }
 
     public function index()
     {
-        $this->render('admin/master/customers_view');
+        $this->render('admin/master/relasi_view');
     }
 
     public function get_data_all(){
 
-        $list = $this->customer_model->get_datatables();
+        $list = $this->relasi_model->get_datatables();
         $data = array();
         $no = $this->input->post('start');
         foreach ($list as $dt) {
@@ -41,18 +41,18 @@ class Customers extends Admin_Controller
             $row = array();
             $row[] = $no;
             // $row[] = $dt->id;
-            $row[] = $dt->name;
-            $row[] = $dt->email;
-            $row[] = $dt->fact;
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_customers('."'".$dt->id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-				  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_customers('."'".$dt->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = $dt->kode;
+            $row[] = $dt->nama;
+            $row[] = $dt->alamat;
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_relasi('."'".$dt->id."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+				  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_relasi('."'".$dt->id."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
             $data[] = $row;
         }
 
         $output = array(
             "draw" => $this->input->post('draw'),
-            "recordsTotal" => $this->customer_model->count_all(),
-            "recordsFiltered" => $this->customer_model->count_filtered(),
+            "recordsTotal" => $this->relasi_model->count_all(),
+            "recordsFiltered" => $this->relasi_model->count_filtered(),
             "data" => $data,
         );
         //output to json format
@@ -61,13 +61,13 @@ class Customers extends Admin_Controller
 
     public function edit($id)
     {
-        $data = $this->customer_model->get($id);
+        $data = $this->relasi_model->get($id);
         $data  = array(
             'id' => $data->id,
-            'name' => $data->name,
-            'email' => $data->email,
-            'fact' => $data->fact,
-            'detailCustomers'=> (array) null
+            'kode' => $data->kode,
+            'nama' => $data->nama,
+            'alamat' => $data->alamat,
+            'detailRelasi'=> (array) null
         );
         echo json_encode(array($data));
     }
@@ -79,11 +79,11 @@ class Customers extends Admin_Controller
         $json = json_decode($datax);
 
         $data = array(
-            'name' => $this->input->post('name'),
-            'email' => $this->input->post('email'),
-            'fact' => $this->input->post('fact')
+            'kode' => $this->input->post('kode'),
+            'nama' => $this->input->post('nama'),
+            'alamat' => $this->input->post('alamat')
         );
-        $insert = $this->customer_model->save($data);
+        $insert = $this->relasi_model->save($data);
         $id = $this->db->insert_id();
 
         // Matikan Kalau tidak ada detail
@@ -112,11 +112,11 @@ class Customers extends Admin_Controller
         $json = json_decode($datax);
 
         $data = array(
-            'name' => $this->input->post('name'),
-            'email' => $this->input->post('email'),
-            'fact' => $this->input->post('fact')
+            'kode' => $this->input->post('kode'),
+            'nama' => $this->input->post('nama'),
+            'alamat' => $this->input->post('alamat')
         );
-        $this->customer_model->update_by_id(array('id' => $this->input->post('id')), $data);
+        $this->relasi_model->update_by_id(array('id' => $this->input->post('id')), $data);
 
         // Matikan kalau tidak ada Detail.
 
@@ -150,7 +150,7 @@ class Customers extends Admin_Controller
             $this->detail_barang_model->delete($rw['id']);
         endforeach;*/
 
-        $this->customer_model->delete($id);
+        $this->relasi_model->delete($id);
         echo json_encode(array("status" => TRUE));
     }
 

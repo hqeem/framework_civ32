@@ -7,7 +7,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Data Customers</h2>
+                            <h2>Data Delivery Order</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                 </li>
@@ -16,7 +16,7 @@
                         </div>
                         <div class="x_content">
                             <p>
-                                <button class="btn btn-success" onclick="add_customers()"><i class="glyphicon glyphicon-plus"></i> Tambah Customers</button>
+                                <button class="btn btn-success" onclick="add_delivery_order()"><i class="glyphicon glyphicon-plus"></i> Tambah Delivery Order</button>
                                 <button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
                             </p>
 
@@ -26,9 +26,13 @@
                                 <tr>
                                     <th>No</th>
                                     <!-- <th>Id</th> -->
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Fact</th>
+                                    <th>No. DO</th>
+                                    <th>Tanggal DO</th>
+                                    <th>Tanggal Kirim</th>
+                                    <th>Kode Relasi</th>
+                                    <th>Nama Relasi</th>
+                                    <th>Jumlah Order (Kodi)</th>
+                                    <th>Keterangan</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -65,7 +69,7 @@
             "order": [], //Initial no order.
             // Load data for the table's content from an Ajax source
             "ajax": {
-                "url": "<?php echo site_url('admin/master/customers/get_data_all');?>",
+                "url": "<?php echo site_url('admin/transaksi/delivery_order/get_data_all');?>",
                 "type": "POST"
             },
             buttons: [
@@ -136,7 +140,7 @@
 
 
 
-    function add_customers()
+    function add_delivery_order()
     {
         save_method = 'add';
         $('#form')[0].reset(); // reset form on modals
@@ -144,7 +148,7 @@
         $('.help-block').empty(); // clear error string
         /*table_detail.clear().draw();*/
         $('#modal_form').modal('show'); // show bootstrap modal
-        $('.modal-title').text('Tambah Customers'); // Set Title to Bootstrap modal title
+        $('.modal-title').text('Tambah Delivery Order'); // Set Title to Bootstrap modal title
     }
 
     // Matikan Kalau tidak ada detail
@@ -158,7 +162,25 @@
         $('.modal-title').text('Tambah Detail Barang'); // Set Title to Bootstrap modal title
     }*/
 
-    function edit_customers(id)
+    function set_nama_relasi(kode)
+    {
+        //Ajax Load data from ajax
+        $.ajax({
+            url : "<?php echo site_url('admin/transaksi/delivery_order/get_relasi_by_kode/')?>/" + kode,
+            type: "GET",
+            dataType: "JSON",
+            success: function(data)
+            {
+                $('#nama_relasi').val(data[0]['nama']);
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                alert('Error get data from ajax');
+            }
+        });
+    }
+
+    function edit_delivery_order(id)
     {
         save_method = 'update';
         $('#form')[0].reset(); // reset form on modals
@@ -167,15 +189,19 @@
 
         //Ajax Load data from ajax
         $.ajax({
-            url : "<?php echo site_url('admin/master/customers/edit/')?>/" + id,
+            url : "<?php echo site_url('admin/transaksi/delivery_order/edit/')?>/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data)
             {
                 $('[name="id"]').val(data[0]['id']);
-                $('[name="name"]').val(data[0]['name']);
-                $('[name="email"]').val(data[0]['email']);
-                $('[name="fact"]').val(data[0]['fact']);
+                $('[name="nomor_do"]').val(data[0]['nomor_do']);
+                $('[name="tanggal_do"]').val(data[0]['tanggal_do']);
+                $('[name="tanggal_kirim"]').val(data[0]['tanggal_kirim']);
+                $('[name="kode_relasi"]').val(data[0]['kode_relasi']);
+                $('[name="nama_relasi"]').val(data[0]['nama_relasi']);
+                $('[name="jumlah_order"]').val(data[0]['jumlah_order']);
+                $('[name="keterangan"]').val(data[0]['keterangan']);
                 
                 // Matikan Kalau tidak ada detail.
                 /*table_detail.clear().draw();
@@ -185,7 +211,7 @@
                 }*/
 
                 $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-                $('.modal-title').text('Ubah Customers'); // Set title to Bootstrap modal title
+                $('.modal-title').text('Ubah Delivery Order'); // Set title to Bootstrap modal title
 
             },
             error: function (jqXHR, textStatus, errorThrown)
@@ -206,9 +232,9 @@
         var url;
 
         if(save_method === 'add') {
-            url = "<?php echo site_url('admin/master/customers/add')?>";
+            url = "<?php echo site_url('admin/transaksi/delivery_order/add')?>";
         } else {
-            url = "<?php echo site_url('admin/master/customers/update')?>";
+            url = "<?php echo site_url('admin/transaksi/delivery_order/update')?>";
         }
 
         seen = [];
@@ -294,13 +320,13 @@
         } );
     }*/
 
-    function delete_customers(id)
+    function delete_delivery_order(id)
     {
         if(confirm('Anda yakin mau menghapus data ini ?'))
         {
             // ajax delete data to database
             $.ajax({
-                url : "<?php echo site_url('admin/master/customers/delete')?>/"+id,
+                url : "<?php echo site_url('admin/transaksi/delivery_order/delete')?>/"+id,
                 type: "POST",
                 dataType: "JSON",
                 success: function(data)
@@ -326,30 +352,58 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title">Form Customers</h3>
+                <h3 class="modal-title">Form Delivery Order</h3>
             </div>
             <div class="modal-body form">
                 <form action="#" id="form" class="form-horizontal">
                     <input type="hidden" value="" name="id"/>
                     <div class="form-body">
                         <div class="form-group">
-                            <label class="control-label col-md-3">Name <span class="required">*</span></label>
+                            <label class="control-label col-md-3">No. DO <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="name" placeholder="Nama Customers" class="validate[required,minSize[6]] form-control" type="text" required="required">
+                                <input name="nomor_do" placeholder="Nomor DO" class="validate[required,minSize[1]] form-control" type="text" required="required">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Email <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Tanggal DO <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="email" placeholder="Email" class="validate[required,custom[email]] form-control" type="email" required="required">
+                                <input placeholder="mm/dd/yyyy" name="tanggal_do" class="validate[required] form-control datepicker" type="text" required="required">
                                 <span class="help-block"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-md-3">Fact <span class="required">*</span></label>
+                            <label class="control-label col-md-3">Tanggal Kirim <span class="required">*</span></label>
                             <div class="col-md-9">
-                                <input name="fact" placeholder="Fact" class="validate[required,minSize[6]] form-control" type="text" required="required">
+                                <input placeholder="mm/dd/yyyy" name="tanggal_kirim" class="validate[required] form-control datepicker" type="text" required="required">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Kode Relasi <span class="required">*</span></label>
+                            <div class="col-md-9">
+                                <input name="kode_relasi" id="kode_relasi" placeholder="Jenis Barang" class="validate[required] form-control" type="text">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Nama Relasi <span class="required">*</span></label>
+                            <div class="col-md-9">
+                                <input name="nama_relasi" id="nama_relasi" placeholder="Nama Relasi" class="validate[required,minSize[3]] form-control" type="text" required="required" readonly>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Jumlah Order (Kodi) <span class="required">*</span></label>
+                            <div class="col-md-9">
+                                <input name="jumlah_order" placeholder="Jumlah Order" class="validate[required] form-control" type="number" min="1" required="required">
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Keterangan <span class="required">*</span></label>
+                            <div class="col-md-9">
+                                <textarea name="keterangan" placeholder="Keterangan" class="validate[required,minSize[6]] form-control" type="text" required="required"></textarea>
                                 <span class="help-block"></span>
                             </div>
                         </div>
@@ -379,6 +433,52 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <!-- End Bootstrap modal -->
+
+<script>
+
+$('#kode_relasi').ajaxComboBox(
+    '<?php echo site_url('admin/transaksi/delivery_order/combo_kode_relasi/');?>',
+    {
+        lang: 'en',
+        field: 'kode',
+        sub_info: true,
+        select_only: true,
+        sub_as: {
+            id: 'Id',
+            kode: 'Kode',
+            nama: 'Nama',
+            alamat: 'Alamat'
+        },
+        bind_to: 'foo',
+        primary_key: 'kode',
+        show_field: 'id,kode,nama,alamat',
+        button_img: '<?php echo site_url('assets/ajax.combobox/dist/btn.png');?>'
+    }
+)
+    .bind('foo', function(e, is_enter_key) {
+        if (!is_enter_key) {
+
+            var x = document.getElementById("kode_relasi").title;
+            if(x==="Attention : Please choose from among the list."){
+                $("#kode_relasi").val("");
+            }
+        }
+    })
+    .keydown(function(e) {
+        if(e.keyCode === 13) {
+            var x = document.getElementById("kode_relasi").title;
+            if(x==="Attention : Please choose from among the list."){
+                $("#kode_relasi").val("");
+            }
+        }
+    });
+
+$('#kode_relasi').change(function() {
+    set_nama_relasi($('#kode_relasi').val());
+    // $('#nama_relasi').val($('#kode_relasi').val());
+});
+
+</script>
 
 
 
